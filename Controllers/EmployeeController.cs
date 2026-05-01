@@ -1,83 +1,53 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+
+
+// 資料庫連接，模型
+using EmployeeAPI.Data;
+using EmployeeAPI.Models;
+
+using SQLitePCL;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeAPI.Controllers
 {
-    public class EmployeeController : Controller
+
+    //  controller 的路由基底會是 api/employee
+
+    // Web API 通常只需要處理 HTTP request / response，不需要 View 相關功能
+    // Web API controller => 繼承的是 ControllerBase，沒有 View 支援
+    // MVC Razor 語法 =>  才會繼承 Controller，有 View 支援
+
+
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EmployeeController : ControllerBase
     {
-        // GET: EmployeeController
-        public ActionResult Index()
+
+        // 建構式注入
+        // 把 Program.cs 裡註冊好的 AppDbContext 注入進來
+        private readonly AppDbContext _context;
+
+        public EmployeeController(AppDbContext context)
         {
-            return View();
+            _context = context;
         }
 
-        // GET: EmployeeController/Details/5
-        public ActionResult Details(int id)
+
+        // 取得全部員工
+        // /api/employee
+
+        // async ... await    GetEmployeeAsync()   ToListAsync()
+        // 回傳型別 ActionResult<IEnumerable<Employee>>
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployeeAsync()
         {
-            return View();
+            var employees = await _context.Employees.ToListAsync();
+            return Ok(employees);
         }
 
-        // GET: EmployeeController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
 
-        // POST: EmployeeController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: EmployeeController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
 
-        // POST: EmployeeController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: EmployeeController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: EmployeeController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }
